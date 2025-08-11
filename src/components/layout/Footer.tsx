@@ -66,7 +66,7 @@ const Footer: React.FC = () => {
 
         <div className="border-t border-gray-800 mt-8 pt-8 text-center">
           <p className="font-inter text-gray-400 dark:text-gray-300">
-            © 2024 Ishaara AI. All rights reserved. Built with ❤️ for accessibility.
+            © 2025 Ishaara AI. All rights reserved. 
           </p>
         </div>
       </div>
