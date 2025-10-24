@@ -1,19 +1,34 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Video, Zap } from 'lucide-react';
-import WebcamCapture from '../demo/WebcamCapture';
 import TranslationDisplay from '../demo/TranslationDisplay';
 
 const DemoSection: React.FC = () => {
   const [translations, setTranslations] = useState<string[]>([]);
   const [isCapturing, setIsCapturing] = useState(false);
+  // Listen for postMessage events from the embedded iframe (hand sign app)
+  useEffect(() => {
+    const allowedOrigin = 'https://handsign-m4qq6.ondigitalocean.app';
 
-  const handleNewTranslation = () => {
-    // Frontend only - no functionality
-  };
+    function handleMessage(event: MessageEvent) {
+      // Only accept messages from the trusted iframe origin
+      if (event.origin !== allowedOrigin) return;
+      try {
+        const data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
+        if (data && data.text) {
+          setTranslations(prev => [...prev, data.text]);
+        }
+      } catch (err) {
+        // ignore malformed messages
+      }
+    }
+
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, []);
 
   return (
     <section id="demo" className="py-20 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-dark-900 dark:to-dark-800">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+  <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center mb-16">
           <div className="flex items-center justify-center mb-4">
@@ -29,25 +44,51 @@ const DemoSection: React.FC = () => {
           </p>
         </div>
 
-        {/* Demo Interface */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+  {/* Demo Interface */}
+  <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Webcam Section */}
-          <div className="space-y-4">
+          <div className="space-y-4 lg:col-span-9">
             <div className="flex items-center space-x-2 mb-4">
               <Zap className="h-5 w-5 text-coral-500" />
               <h3 className="font-poppins font-semibold text-xl text-gray-900 dark:text-gray-100">
                 Camera Feed
               </h3>
             </div>
-            <WebcamCapture
-              onTranslation={handleNewTranslation}
-              isCapturing={isCapturing}
-              setIsCapturing={setIsCapturing}
-            />
+            {/* Embedded third-party hand-sign app */}
+            <div className="rounded-2xl overflow-hidden border border-white/10">
+              <iframe
+                src="https://handsign-m4qq6.ondigitalocean.app/"
+                title="HandSign"
+                className="w-full h-[85vh]"
+                // Allow the iframe to access camera/microphone and run scripts
+                allow="camera; microphone; autoplay; encrypted-media; clipboard-read; clipboard-write"
+                sandbox="allow-scripts allow-forms allow-same-origin allow-popups"
+              />
+            </div>
+
+            {/* Start/Stop controls for UI flow (iframe handles capture/translation)
+                These control the live indicator only. */}
+            <div className="flex justify-center mt-4">
+              {!isCapturing ? (
+                <button
+                  onClick={() => setIsCapturing(true)}
+                  className="px-4 py-2 bg-teal-600 text-white rounded-md hover:bg-teal-700"
+                >
+                  Start
+                </button>
+              ) : (
+                <button
+                  onClick={() => setIsCapturing(false)}
+                  className="px-4 py-2 bg-coral-500 text-white rounded-md hover:bg-coral-600"
+                >
+                  Stop
+                </button>
+              )}
+            </div>
           </div>
 
           {/* Translation Section */}
-          <div className="space-y-4">
+          <div className="space-y-4 lg:col-span-3">
             <div className="flex items-center space-x-2 mb-4">
               <div className="w-5 h-5 bg-teal-500 rounded-full flex items-center justify-center">
                 <div className="w-2 h-2 bg-white rounded-full"></div>

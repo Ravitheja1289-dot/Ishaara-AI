@@ -1,21 +1,22 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import Webcam from 'react-webcam';
-import { Play, Square, Camera, Loader } from 'lucide-react';
+import { Play, Square, Loader } from 'lucide-react';
 import Button from '../ui/Button';
 
 interface WebcamCaptureProps {
-  onTranslation: (text: string) => void;
+  onFrame: (frame: string) => void;
   isCapturing: boolean;
   setIsCapturing: (capturing: boolean) => void;
 }
 
 const WebcamCapture: React.FC<WebcamCaptureProps> = ({ 
-  onTranslation, 
+  onFrame, 
   isCapturing, 
   setIsCapturing 
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const webcamRef = useRef<Webcam>(null);
+  const captureInterval = useRef<NodeJS.Timeout | null>(null);
 
   const handleStartCapture = useCallback(async () => {
     setIsLoading(true);
@@ -25,11 +26,35 @@ const WebcamCapture: React.FC<WebcamCaptureProps> = ({
       setIsLoading(false);
       setIsCapturing(true);
     }, 2000);
-  }, [onTranslation, setIsCapturing]);
-
+  }, [setIsCapturing]);
+  
   const handleStopCapture = useCallback(() => {
     setIsCapturing(false);
   }, [setIsCapturing]);
+
+  useEffect(() => {
+    if (isCapturing) {
+      captureInterval.current = setInterval(() => {
+        if (webcamRef.current) {
+          const frame = webcamRef.current.getScreenshot();
+          if (frame) {
+            onFrame(frame);
+          }
+        }
+      }, 500); // Send a frame every 500ms
+    } else {
+      if (captureInterval.current) {
+        clearInterval(captureInterval.current);
+        captureInterval.current = null;
+      }
+    }
+
+    return () => {
+      if (captureInterval.current) {
+        clearInterval(captureInterval.current);
+      }
+    };
+  }, [isCapturing, onFrame]);
 
   return (
     <div className="space-y-4">

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { MessageSquare, Copy, Download } from 'lucide-react';
 
 interface TranslationDisplayProps {
@@ -28,6 +28,8 @@ const TranslationDisplay: React.FC<TranslationDisplayProps> = ({
     URL.revokeObjectURL(url);
   };
 
+  const latestTranslation = translations[translations.length - 1] || null;
+
   return (
     <div className="space-y-4">
       {/* Current Translation */}
@@ -49,12 +51,18 @@ const TranslationDisplay: React.FC<TranslationDisplayProps> = ({
         </div>
 
         <div className="min-h-[120px] flex items-center">
-          <p className="font-inter text-gray-500 dark:text-gray-400 italic">
-            {isCapturing 
-              ? 'Ready to capture sign language...' 
-              : 'Start capturing to see translations appear here'
-            }
-          </p>
+          {latestTranslation ? (
+            <p className="font-inter text-2xl text-gray-800 dark:text-gray-200">
+              {latestTranslation}
+            </p>
+          ) : (
+            <p className="font-inter text-gray-500 dark:text-gray-400 italic">
+              {isCapturing 
+                ? 'Ready to capture sign language...' 
+                : 'Start capturing to see translations appear here'
+              }
+            </p>
+          )}
         </div>
       </div>
 
@@ -69,6 +77,7 @@ const TranslationDisplay: React.FC<TranslationDisplayProps> = ({
                 onClick={copyToClipboard}
                 className="p-2 bg-gray-200 dark:bg-dark-700 rounded-lg hover:bg-gray-300 dark:hover:bg-dark-600 transition-colors text-gray-700 dark:text-gray-200"
                 title="Copy to clipboard"
+                disabled={translations.length === 0}
               >
                 <Copy className="h-4 w-4" />
               </button>
@@ -76,16 +85,29 @@ const TranslationDisplay: React.FC<TranslationDisplayProps> = ({
                 onClick={downloadTranscript}
                 className="p-2 bg-gray-200 dark:bg-dark-700 rounded-lg hover:bg-gray-300 dark:hover:bg-dark-600 transition-colors text-gray-700 dark:text-gray-200"
                 title="Download transcript"
+                disabled={translations.length === 0}
               >
                 <Download className="h-4 w-4" />
               </button>
             </div>
           </div>
 
-          <div className="min-h-[120px] flex items-center justify-center">
-            <p className="font-inter text-gray-500 dark:text-gray-400 italic">
-              Translation history will appear here
-            </p>
+          <div className="min-h-[120px] max-h-48 overflow-y-auto">
+            {translations.length > 0 ? (
+              <ul className="space-y-2">
+                {translations.slice().reverse().map((trans, index) => (
+                  <li key={index} className="font-inter text-gray-700 dark:text-gray-300">
+                    {trans}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <div className="flex items-center justify-center h-full">
+                <p className="font-inter text-gray-500 dark:text-gray-400 italic">
+                  Translation history will appear here
+                </p>
+              </div>
+            )}
           </div>
         </div>
     </div>

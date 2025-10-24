@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Menu, X, Moon, Sun, Video } from 'lucide-react';
 import { useDarkMode } from '../../hooks/useDarkMode';
-import Button from '../ui/Button';
 
 const Navbar: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
