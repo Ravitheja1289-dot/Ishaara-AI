@@ -1,30 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Video, Zap } from 'lucide-react';
-import TranslationDisplay from '../demo/TranslationDisplay';
 
 const DemoSection: React.FC = () => {
-  const [translations, setTranslations] = useState<string[]>([]);
   const [isCapturing, setIsCapturing] = useState(false);
-  // Listen for postMessage events from the embedded iframe (hand sign app)
-  useEffect(() => {
-    const allowedOrigin = 'https://handsign-m4qq6.ondigitalocean.app';
-
-    function handleMessage(event: MessageEvent) {
-      // Only accept messages from the trusted iframe origin
-      if (event.origin !== allowedOrigin) return;
-      try {
-        const data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
-        if (data && data.text) {
-          setTranslations(prev => [...prev, data.text]);
-        }
-      } catch (err) {
-        // ignore malformed messages
-      }
-    }
-
-    window.addEventListener('message', handleMessage);
-    return () => window.removeEventListener('message', handleMessage);
-  }, []);
 
   return (
     <section id="demo" className="py-20 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-dark-900 dark:to-dark-800">
@@ -46,8 +24,8 @@ const DemoSection: React.FC = () => {
 
   {/* Demo Interface */}
   <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          {/* Webcam Section */}
-          <div className="space-y-4 lg:col-span-9">
+    {/* Webcam Section */}
+    <div className="space-y-4 lg:col-span-12">
             <div className="flex items-center space-x-2 mb-4">
               <Zap className="h-5 w-5 text-coral-500" />
               <h3 className="font-poppins font-semibold text-xl text-gray-900 dark:text-gray-100">
@@ -87,21 +65,7 @@ const DemoSection: React.FC = () => {
             </div>
           </div>
 
-          {/* Translation Section */}
-          <div className="space-y-4 lg:col-span-3">
-            <div className="flex items-center space-x-2 mb-4">
-              <div className="w-5 h-5 bg-teal-500 rounded-full flex items-center justify-center">
-                <div className="w-2 h-2 bg-white rounded-full"></div>
-              </div>
-              <h3 className="font-poppins font-semibold text-xl text-gray-900 dark:text-gray-100">
-                AI Translation
-              </h3>
-            </div>
-            <TranslationDisplay
-              translations={translations}
-              isCapturing={isCapturing}
-            />
-          </div>
+          {/* (translation UI removed) */}
         </div>
 
         {/* Features */}
