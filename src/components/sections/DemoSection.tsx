@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Video, Zap } from 'lucide-react';
 
 const DemoSection: React.FC = () => {
-  const [isCapturing, setIsCapturing] = useState(false);
+  // iframe-only demo; parent does not manage capture state
 
   return (
     <section id="demo" className="py-20 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-dark-900 dark:to-dark-800">
@@ -44,25 +44,7 @@ const DemoSection: React.FC = () => {
               />
             </div>
 
-            {/* Start/Stop controls for UI flow (iframe handles capture/translation)
-                These control the live indicator only. */}
-            <div className="flex justify-center mt-4">
-              {!isCapturing ? (
-                <button
-                  onClick={() => setIsCapturing(true)}
-                  className="px-4 py-2 bg-teal-600 text-white rounded-md hover:bg-teal-700"
-                >
-                  Start
-                </button>
-              ) : (
-                <button
-                  onClick={() => setIsCapturing(false)}
-                  className="px-4 py-2 bg-coral-500 text-white rounded-md hover:bg-coral-600"
-                >
-                  Stop
-                </button>
-              )}
-            </div>
+            {/* No Start/Stop controls — embedded app manages capture and permissions */}
           </div>
 
           {/* (translation UI removed) */}
